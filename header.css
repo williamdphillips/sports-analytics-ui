@@ -1,5 +1,9 @@
 /* Sports Analytics */
-
+#wrapper {
+    margin-left:auto;
+    margin-right:auto;
+    width:1600px;
+}
 body {
     background-color: lightgray;
     margin: 0;
@@ -15,11 +19,13 @@ p {
 
 #navBar {
     width: 100%;
+    min-width: 500px;
     margin: -3px 0px 0px 0px;
     padding: 8px 0px 0px 0px;
     height: 55px;
     background-color: #222222;
     position: fixed;
+    overflow: hidden;
     /*border-bottom: rgba(255, 0, 0, .8) solid 50px;*/
 }
 
