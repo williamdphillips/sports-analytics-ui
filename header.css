@@ -26,6 +26,7 @@ p {
     background-color: #222222;
     position: fixed;
     overflow: hidden;
+    z-index: 2;
     /*border-bottom: rgba(255, 0, 0, .8) solid 50px;*/
 }
 
