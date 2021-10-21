@@ -117,7 +117,7 @@ p {
     height: 30px;
     width: 30px;
     margin: 10px 15px;
-    background-image: url("/images/notification.png");
+    background-image: url("images/notification.png");
     object-fit: scale-down;
     opacity: .5;
     cursor: pointer;
