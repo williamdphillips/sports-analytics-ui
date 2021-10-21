@@ -1,11 +1,11 @@
 #leftColumn {
     float: left;
-    width: 20%;
+    width: 25%;
     height: 100%;
     background-color: rgb(255, 255, 255);
     margin: 10px 0px 0px 0px;
-    position: absolute;
     z-index: 1;
+    min-width: 135px;
 }
 
 #leftColumn h3 {
@@ -37,6 +37,12 @@
     margin: 0px 0px 0px 50px;
 }
 
+@media only screen and (max-width: 1120px) {
+    .teamContainer a {
+        visibility: hidden;
+    }
+}
+
 .teamContainer a {
     display: inline-block;
     text-decoration: none;
@@ -46,11 +52,26 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-#navigationContainer {
+#content {
+    margin-top: 50px;
+    white-space: nowrap;
     display: inline-block;
-    width: 50.5%;
-    height: 20px;
-    margin: 25px 0px 0px 25px;
+    width: 100%;
+}
+
+#middleContent {
+    white-space: normal;
+    display: inline-block;
+    width: 75%;
+    height: 100%;
+    margin: 0;
+}
+
+#navigationContainer {
+    display: block;
+    width: 50%;
+    min-height: max-content;
+    margin: 25px auto 0px auto;
     background-color: white;
     border-radius: 10px;
     padding: 5px;
@@ -63,7 +84,8 @@
 }
 
 #linkContainer p {
-    display: inline;
+    display: inline-block;
+    min-width: fit-content;
     margin: 0px 10px;
     color: rgba(0, 0, 0, .8);
     cursor: pointer;
@@ -73,29 +95,23 @@
     border-bottom: solid 1px red;
 }
 
-#content {
-    position: absolute;
-    margin: 0px 0px 0px 20%;
-    width: 100%;
-}
-
 #middleContentContainer {
-    position: relative;
     display: inline-block;
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+    min-width: fit-content;
 }
 
 .liveScoreContainer {
     display: inline-block;
-    width: 100%;
+    width: 50%;
     position: relative;
     height: 200px;
-    margin: 25px 25px;
+    margin: 10px 0px 0px 25px;
     background-color: white;
     border-radius: 10px;
     padding: 10px;
+    min-width: 300px;
+    max-width: 415px;
 }
 
 .awayContainer {
@@ -118,7 +134,7 @@
 .scoreContainer .scoreValue{
     text-align: center;
     width: 100%;
-    font-size: 50pt;
+    font-size: 35pt;
     color: rgba(0, 0, 0, .8);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
@@ -140,8 +156,8 @@
 }
 
 .liveScoreContainer .awayTeamImage{
-    height: 100%;
-    width: 100%;
+    height: 80%;
+    width: 80%;
     margin: auto;
     object-fit: scale-down;
 }
@@ -153,8 +169,8 @@
 }
 
 .liveScoreContainer .homeTeamImage{
-    height: 100%;
-    width: 100%;
+    height: 80%;
+    width: 80%;
     margin: auto;
     object-fit: scale-down;
 }
