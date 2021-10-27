@@ -1,0 +1,22 @@
+.nav-sub-middle {
+    text-align: center;
+    color: gray;
+    cursor:default;
+    margin: auto;
+}
+
+.nav-sub-anchor {
+    cursor: pointer;
+    text-decoration: none;
+    color: gray;
+}
+
+.nav-sub-anchor-active{
+    cursor: pointer;
+    text-decoration: none;
+    color: red;
+}
+
+.nav-sub-anchor:hover {
+    color: rgb(219, 0, 0);
+}

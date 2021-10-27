@@ -1,0 +1,93 @@
+.card-left {
+    display: inline-block;
+    text-align: center;
+    min-width: max-content;
+}
+
+.card-center {
+    display: inline-block;
+    text-align: center;
+    min-width: max-content;
+    margin: 0 0;
+}
+
+.card-center-small {
+    min-height: fit-content;
+    max-width: 15rem;
+    margin: 0 1rem;
+}
+
+.card-right {
+    display: inline-block;
+    text-align: center;
+    min-width: max-content;
+}
+
+.card-bold {
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 1rem;
+}
+
+.card-football-left {
+    display: block;
+    visibility: visible;
+    margin: 1rem auto -.5rem auto;
+}
+
+.card-football-right {
+    display: block;
+    visibility: hidden;
+    margin: auto;
+    margin: 1rem auto -.5rem auto;
+}
+
+.card-anchor {
+    display: block;
+    text-decoration: none;
+    color: black;
+}
+
+.card-anchor:hover {
+    text-decoration: none;
+    color: black;
+}
+
+.card-football-field {
+    display: inline-block;
+    position: relative;
+    background-image: URL("../images/football-field-blank.jpg");
+    background-size: 100% 100%;
+    width: 80%;
+    height: 150px;
+    margin: auto;
+}
+
+.card-endzone {
+    display: inline-block;
+    width: 8.5%;
+    height: 150px;
+    border: white solid 1px;
+    margin: 0 -1.5%;
+    opacity: .8;
+}
+
+.first-down-line {
+    display: inline-block;
+    position: absolute;
+    width: 0.5%;
+    height: 150px;
+    margin: 0;
+    opacity: .8;
+    background-color: yellow;
+}
+
+.line-of-scrimmage {
+    display: inline-block;
+    position: absolute;
+    width: 0.5%;
+    height: 150px;
+    margin: 0;
+    opacity: .8;
+    background-color: rgb(38, 0, 255);
+}
