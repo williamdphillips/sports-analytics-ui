@@ -3,6 +3,7 @@ let baseURL = 'http://192.168.1.243:8080';
 var resp = '';
 var games;
 var currentWeek;
+var selectedWeek;
 
 function setInnerHtml(elm, html) {
     elm.innerHTML = html;
@@ -15,7 +16,7 @@ function setInnerHtml(elm, html) {
     });
   }
 
-function getModel(game, i) {
+function getModel(game, i, accordionStatus) {
     if (game.state == "pre" || game.state== "post") {
         return `<div class="col">
         <div class="card text-center">
@@ -45,12 +46,12 @@ function getModel(game, i) {
                     height="12" alt="" style="${game.currentPlay.homeTeamPossession}">
         </div>
         <hr style="margin-bottom: 0">
-        <div class="accordion" id="accordionExample">
+        <div class="accordion">
             <img data-bs-toggle="collapse" data-bs-target="#collapse${i}"
                 style="cursor:pointer; margin-bottom: 0;" src="images/arrow-down.png" width="20"
-                height="20" alt="">
+                height="20" alt="" id="accordionCollapse${i}" >
         </div>
-        <div id="collapse${i}" class="panel-collapse collapse in">
+        <div id="collapse${i}" class="panel-collapse collapse in ${accordionStatus}">
             <div class="panel-body">
             <div style="display:block; width=100%;">
             
@@ -60,7 +61,7 @@ function getModel(game, i) {
                 var data = {
                     labels: ['${game.homeTeam.abbrev}', '${game.awayTeam.abbrev}'],
                     datasets: [{
-                        data: [${game.awayTeam.chanceWin}, ${game.homeTeam.chanceWin}],
+                        data: [${game.awayTeam.winPrediction}, ${game.homeTeam.winPrediction}],
                         backgroundColor: [
                             '#${game.homeTeam.primaryColor}',
                             '#${game.awayTeam.primaryColor}'
@@ -162,6 +163,11 @@ function getModel(game, i) {
                 ${game.shortDetail}
             </p>
             <p style="margin-bottom: 0; font-size: .9rem;">${game.currentPlay.downDistanceShortText}</p>
+            <div class="container">
+                <div class="live-path">
+                    <span class="live-shape trail"></span> 
+                </div>
+            </div>
         </div>
         <div class="card-right" href="#">
             <img src="${game.homeTeam.logoURL}" width="40" height="40" alt="">
@@ -173,13 +179,14 @@ function getModel(game, i) {
                     height="12" alt="" style="${game.currentPlay.homeTeamPossession}">
         </div>
         <hr style="margin-bottom: 0">
-        <div class="accordion" id="accordionExample">
+        <div class="accordion">
             <img data-bs-toggle="collapse" data-bs-target="#collapse${i}"
                 style="cursor:pointer; margin-bottom: 0;" src="images/arrow-down.png" width="20"
-                height="20" alt="">
+                height="20" alt="" id="accordionCollapse${i}">
         </div>
-        <div id="collapse${i}" class="panel-collapse collapse in">
+        <div id="collapse${i}" class="panel-collapse collapse in ${accordionStatus}">
             <div class="panel-body">
+            <p style="margin-bottom: 0; font-size: .9rem;">${game.currentPlay.driveDescription}</p>
                 <div class="card-endzone away-team" style="background-color: #${game.awayTeam.primaryColor};"></div>
                 <div class="card-football-field">
                     <div class="first-down-line" style="left: ${game.currentPlay.firstDownLine}%;"></div>
@@ -196,11 +203,22 @@ function getModel(game, i) {
     }
 }
 
-function updateGames(response) {
+function updateGames(response, args) {
+
     console.log("updating games");
-    games = response.events;
     console.log(response);
-    updateWeekContainer(response);
+    console.log(args);
+
+    if(args.week == undefined){
+        updateWeekContainer(response.currentWeekNumber);
+        games = response.weeks[response.currentWeekNumber].events;
+        currentWeek = response.currentWeekNumber;
+    }
+    else{
+        updateWeekContainer(args.week);
+        games = response.weeks[args.week].events;
+    }
+    
 
     let container = document.getElementById("content");
 
@@ -242,6 +260,8 @@ function updateGames(response) {
                 game.currentPlay.playDescription = "";
             if(game.currentPlay.downDistanceShortText == null)
                 game.currentPlay.downDistanceShortText = "";
+            if(game.currentPlay.driveDescription == null || game.currentPlay.driveDescription == undefined)
+                game.currentPlay.driveDescription = "";
 
             game.currentPlay.awayTeamPossession = "visibility: hidden;"
             game.currentPlay.homeTeamPossession = "visibility: hidden;"
@@ -254,12 +274,14 @@ function updateGames(response) {
                 game.currentPlay.homeTeamPossession = "visibility: hidden;"
             }
 
-            console.log("getting model");
-
-            let model = getModel(game, i);
+            let collapseable = document.getElementById(`collapse${i}`);
+            let accordionStatus = "";
+            if(collapseable != null)
+                if(collapseable.getAttribute("class").includes("show")){accordionStatus = "show";}
+            let model = getModel(game, i, accordionStatus);
             htmlGames[i] = model;
         }
-        setInnerHtml(container, htmlGames.join(''))
+        setInnerHtml(container, htmlGames.join(''));
     }
 }
 
@@ -277,26 +299,22 @@ var HttpClient = function () {
     }
 }
 
-function updateWeekContainer(response) {
+function updateWeekContainer(weekNumber) {
     let weekContainer = document.getElementById("nav-sub-container").children;
     Array.from(weekContainer).forEach(element => {
         element.className = "nav-sub-anchor";
     });
-    console.log(`Week Number: ${response.weekNumber}`)
-    weekContainer[response.weekNumber - 1].className = "nav-sub-anchor-active";
+    console.log(`Week Number: ${weekNumber}`)
+    weekContainer[weekNumber - 1].className = "nav-sub-anchor-active";
 }
 
-function updateWeek(response) {
-    currentWeek = response[0].week;
-}
-
-function updateDocument(endpoint, document, params) {
+function updateDocument(endpoint, document, args) {
 
     console.log(baseURL);
     let searchURL = new URL(`${baseURL}${endpoint}`);
 
     let searchParams = new URLSearchParams(searchURL.searchParams);
-    for (const [key, value] of Object.entries(params)) {
+    for (const [key, value] of Object.entries(args)) {
         searchParams.append(key, value);
     }
     searchURL.search = searchParams;
@@ -305,32 +323,39 @@ function updateDocument(endpoint, document, params) {
 
     var client = new HttpClient();
     client.get(searchURL, function (response) {
-        updateResponse(response, document);
+        updateResponse(response, document, args);
     });
 }
 
-function updateResponse(response, document) {
+function updateResponse(response, document, args) {
     if (document.name == 'allGames'){
         currentWeek = response.weekNumber;
-        updateGames(response);
+        updateGames(response, args);
     }
     if (document.name == 'gamesByWeek')
-        updateGames(response);
+        updateGames(response, args);
 }
 
 function getGamesByWeek(week) {
     console.log(`Getting Games for week ${week}`)
+    selectedWeek = week;
     setLoading();
     if (currentWeek == week)
-        getGames();
+        getGamesInit();
     else{
         updateDocument('/api/nfl/ui/games', { name: 'gamesByWeek' }, { week: week });
     }
 }
 
-function getGames() {
+function getGamesInit() {
     setLoading();
     updateDocument('/api/nfl/ui/games', { name: 'allGames' }, {});
+    setInterval('getGamesUpdate();', 15000);
+}
+
+function getGamesUpdate() {
+    if(selectedWeek == currentWeek)
+        updateDocument('/api/nfl/ui/games', { name: 'allGames' }, {});
 }
 
 function setLoading(){

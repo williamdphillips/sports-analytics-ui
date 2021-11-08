@@ -8,7 +8,7 @@
     display: inline-block;
     text-align: center;
     min-width: max-content;
-    margin: 0 0;
+    margin: 0 0 0 0;
 }
 
 .card-center-small {
@@ -26,7 +26,7 @@
 .card-bold {
     text-decoration: none;
     font-weight: bold;
-    margin: 0 1rem;
+    margin: 0 1rem 0 1rem;
 }
 
 .card-football-left {
@@ -90,4 +90,37 @@
     margin: 0;
     opacity: .8;
     background-color: rgb(38, 0, 255);
+}
+
+.live-path {
+    position: relative;
+    overflow: hidden;
+    width: 50%;
+    height: 2px;
+    background-color: #c1c1c1;
+    margin: 5px auto auto auto;
+}
+.live-shape {
+    position: absolute;
+    left: 0;
+    background-color: green;
+    width: 50%;
+    height: 2px;
+    display: block;
+        top: 0;
+
+    animation: live-ani 2s infinite;
+}
+  
+  
+@keyframes live-ani {
+    0% {
+        left: 0;
+    }
+    50% {
+        left: 50%;
+    }
+    100% {
+        left: 0;
+}
 }
