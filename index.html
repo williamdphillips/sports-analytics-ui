@@ -55,24 +55,24 @@
         <div class="container p-1 text-center">
             <p class="--bs-dark d-inline m-0">Week</p>
             <p class="nav-sub-middle d-inline" id="nav-sub-container">
-                <a href="javascript:getGamesByWeek(1);" class="nav-sub-anchor">1</a> |
-                <a href="javascript:getGamesByWeek(2);" class="nav-sub-anchor">2</a> |
-                <a href="javascript:getGamesByWeek(3);" class="nav-sub-anchor">3</a> |
-                <a href="javascript:getGamesByWeek(4);" class="nav-sub-anchor">4</a> |
-                <a href="javascript:getGamesByWeek(5);" class="nav-sub-anchor">5</a> |
-                <a href="javascript:getGamesByWeek(6);" class="nav-sub-anchor">6</a> |
-                <a href="javascript:getGamesByWeek(7);" class="nav-sub-anchor">7</a> |
-                <a href="javascript:getGamesByWeek(8);" class="nav-sub-anchor">8</a> |
-                <a href="javascript:getGamesByWeek(9);" class="nav-sub-anchor">9</a> |
-                <a href="javascript:getGamesByWeek(10);" class="nav-sub-anchor">10</a> |
-                <a href="javascript:getGamesByWeek(11);" class="nav-sub-anchor">11</a> |
-                <a href="javascript:getGamesByWeek(12);" class="nav-sub-anchor">12</a> |
-                <a href="javascript:getGamesByWeek(13);" class="nav-sub-anchor">13</a> |
-                <a href="javascript:getGamesByWeek(14);" class="nav-sub-anchor">14</a> |
-                <a href="javascript:getGamesByWeek(15);" class="nav-sub-anchor">15</a> |
-                <a href="javascript:getGamesByWeek(16);" class="nav-sub-anchor">16</a> |
-                <a href="javascript:getGamesByWeek(17);" class="nav-sub-anchor">17</a> |
-                <a href="javascript:getGamesByWeek(18);" class="nav-sub-anchor">18</a>
+                <a href="javascript:replaceUrlParam('week', 1);" class="nav-sub-anchor">1</a> |
+                <a href="javascript:replaceUrlParam('week', 2);" class="nav-sub-anchor">2</a> |
+                <a href="javascript:replaceUrlParam('week', 3);" class="nav-sub-anchor">3</a> |
+                <a href="javascript:replaceUrlParam('week', 4);" class="nav-sub-anchor">4</a> |
+                <a href="javascript:replaceUrlParam('week', 5);" class="nav-sub-anchor">5</a> |
+                <a href="javascript:replaceUrlParam('week', 6);" class="nav-sub-anchor">6</a> |
+                <a href="javascript:replaceUrlParam('week', 7);" class="nav-sub-anchor">7</a> |
+                <a href="javascript:replaceUrlParam('week', 8);" class="nav-sub-anchor">8</a> |
+                <a href="javascript:replaceUrlParam('week', 9);" class="nav-sub-anchor">9</a> |
+                <a href="javascript:replaceUrlParam('week', 10);" class="nav-sub-anchor">10</a> |
+                <a href="javascript:replaceUrlParam('week', 11);" class="nav-sub-anchor">11</a> |
+                <a href="javascript:replaceUrlParam('week', 12);" class="nav-sub-anchor">12</a> |
+                <a href="javascript:replaceUrlParam('week', 13);" class="nav-sub-anchor">13</a> |
+                <a href="javascript:replaceUrlParam('week', 14);" class="nav-sub-anchor">14</a> |
+                <a href="javascript:replaceUrlParam('week', 15);" class="nav-sub-anchor">15</a> |
+                <a href="javascript:replaceUrlParam('week', 16);" class="nav-sub-anchor">16</a> |
+                <a href="javascript:replaceUrlParam('week', 17);" class="nav-sub-anchor">17</a> |
+                <a href="javascript:replaceUrlParam('week', 18);" class="nav-sub-anchor">18</a>
             </p>
         </div>
     </div>
@@ -279,7 +279,8 @@
     <!-- Core theme JS-->
     <script src="js/scripts.js"></script>
     <script>
-        getGamesInit();
+        let weekNumber = getParameterByName('week');
+        getGamesByWeek(weekNumber);
     </script>
 </body>
 

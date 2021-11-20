@@ -5,19 +5,45 @@ var games;
 var currentWeek;
 var selectedWeek;
 
+// Parse the URL parameter
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+function replaceUrlParam(paramName, paramValue, url) {
+    if (!url) url = window.location.href;
+    if (paramValue == null) {
+        paramValue = '';
+    }
+    var pattern = new RegExp('\\b(' + paramName + '=).*?(&|#|$)');
+    if (url.search(pattern) >= 0) {
+        url = url.replace(pattern, '$1' + paramValue + '$2');
+        window.location = url;
+    } else {
+        url = url.replace(/[?#]$/, '');
+        url = url + (url.indexOf('?') > 0 ? '&' : '?') + paramName + '=' + paramValue;
+        window.location = url;
+    }
+}
+
 function setInnerHtml(elm, html) {
     elm.innerHTML = html;
     Array.from(elm.querySelectorAll("script")).forEach(oldScript => {
-      const newScript = document.createElement("script");
-      Array.from(oldScript.attributes)
-        .forEach(attr => newScript.setAttribute(attr.name, attr.value));
-      newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-      oldScript.parentNode.replaceChild(newScript, oldScript);
+        const newScript = document.createElement("script");
+        Array.from(oldScript.attributes)
+            .forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+        oldScript.parentNode.replaceChild(newScript, oldScript);
     });
-  }
+}
 
 function getModel(game, i, accordionStatus) {
-    if (game.state == "pre" || game.state== "post") {
+    if (game.state == "pre" || game.state == "post") {
         return `<div class="col">
         <div class="card text-center">
     <div class="card-body">
@@ -209,16 +235,16 @@ function updateGames(response, args) {
     console.log(response);
     console.log(args);
 
-    if(args.week == undefined){
+    if (args.week == undefined) {
         updateWeekContainer(response.currentWeekNumber);
         games = response.weeks[response.currentWeekNumber].events;
         currentWeek = response.currentWeekNumber;
     }
-    else{
+    else {
         updateWeekContainer(args.week);
         games = response.weeks[args.week].events;
     }
-    
+
 
     let container = document.getElementById("content");
 
@@ -227,40 +253,40 @@ function updateGames(response, args) {
         for (i = 0; i < games.length; i++) {
             let game = games[i];
 
-            if(game.period == 1 || game.period == 2){
-                if(game.currentPlay != null){
+            if (game.period == 1 || game.period == 2) {
+                if (game.currentPlay != null) {
                     game.currentPlay.yardLine = 100 - game.currentPlay.yardLine
                     if (game.currentPlay.teamInPossession.id == game.homeTeam.id) {
                         game.currentPlay.firstDownLine = game.currentPlay.yardLine - game.currentPlay.firstDownDistance;
                     } else {
                         game.currentPlay.firstDownLine = game.currentPlay.yardLine + game.currentPlay.firstDownDistance;
                     }
-                }else{
+                } else {
                     game.currentPlay = {};
                     game.currentPlay.teamInPossession = {};
                     game.currentPlay.firstDownLine = 0;
                 }
-            }else{
-                if(game.currentPlay != null){
+            } else {
+                if (game.currentPlay != null) {
                     game.currentPlay.yardLine = 100 - game.currentPlay.yardLine
                     if (game.currentPlay.teamInPossession.id == game.homeTeam.id) {
                         game.currentPlay.firstDownLine = game.currentPlay.yardLine - game.currentPlay.firstDownDistance;
                     } else {
                         game.currentPlay.firstDownLine = game.currentPlay.yardLine + game.currentPlay.firstDownDistance;
                     }
-                }else{
+                } else {
                     game.currentPlay = {};
                     game.currentPlay.teamInPossession = {};
                     game.currentPlay.firstDownLine = 0;
                 }
             }
-            
+
 
             if (game.currentPlay.playDescription == null)
                 game.currentPlay.playDescription = "";
-            if(game.currentPlay.downDistanceShortText == null)
+            if (game.currentPlay.downDistanceShortText == null)
                 game.currentPlay.downDistanceShortText = "";
-            if(game.currentPlay.driveDescription == null || game.currentPlay.driveDescription == undefined)
+            if (game.currentPlay.driveDescription == null || game.currentPlay.driveDescription == undefined)
                 game.currentPlay.driveDescription = "";
 
             game.currentPlay.awayTeamPossession = "visibility: hidden;"
@@ -276,8 +302,8 @@ function updateGames(response, args) {
 
             let collapseable = document.getElementById(`collapse${i}`);
             let accordionStatus = "";
-            if(collapseable != null)
-                if(collapseable.getAttribute("class").includes("show")){accordionStatus = "show";}
+            if (collapseable != null)
+                if (collapseable.getAttribute("class").includes("show")) { accordionStatus = "show"; }
             let model = getModel(game, i, accordionStatus);
             htmlGames[i] = model;
         }
@@ -328,7 +354,7 @@ function updateDocument(endpoint, document, args) {
 }
 
 function updateResponse(response, document, args) {
-    if (document.name == 'allGames'){
+    if (document.name == 'allGames') {
         currentWeek = response.weekNumber;
         updateGames(response, args);
     }
@@ -340,25 +366,22 @@ function getGamesByWeek(week) {
     console.log(`Getting Games for week ${week}`)
     selectedWeek = week;
     setLoading();
-    if (currentWeek == week)
-        getGamesInit();
-    else{
+    if (currentWeek == week || week == null) {
+        setLoading();
+        updateDocument('/api/nfl/ui/games', { name: 'allGames' }, {});
+        setInterval('getGamesUpdate();', 15000);
+    }
+    else {
         updateDocument('/api/nfl/ui/games', { name: 'gamesByWeek' }, { week: week });
     }
 }
 
-function getGamesInit() {
-    setLoading();
-    updateDocument('/api/nfl/ui/games', { name: 'allGames' }, {});
-    setInterval('getGamesUpdate();', 15000);
-}
-
 function getGamesUpdate() {
-    if(selectedWeek == currentWeek)
+    if (selectedWeek == currentWeek)
         updateDocument('/api/nfl/ui/games', { name: 'allGames' }, {});
 }
 
-function setLoading(){
+function setLoading() {
     console.log("Loading")
     let container = document.getElementById("content");
     container.innerHTML = `<div class="spinner-border" style="width: 2rem; height: 2rem; margin: 2rem auto auto auto;" role="status">
