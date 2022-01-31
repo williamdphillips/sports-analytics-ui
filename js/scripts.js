@@ -2,8 +2,10 @@
 let baseURL = 'http://192.168.1.243:8080';
 var resp = '';
 var games;
-var currentWeek;
-var selectedWeek;
+var currentWeekNumber;
+var currentSeasonType;
+var selectedWeekNumber;
+var selectedSeasonType;
 
 // Parse the URL parameter
 function getParameterByName(name, url) {
@@ -15,19 +17,16 @@ function getParameterByName(name, url) {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
-function replaceUrlParam(paramName, paramValue, url) {
-    if (!url) url = window.location.href;
-    if (paramValue == null) {
-        paramValue = '';
-    }
-    var pattern = new RegExp('\\b(' + paramName + '=).*?(&|#|$)');
-    if (url.search(pattern) >= 0) {
-        url = url.replace(pattern, '$1' + paramValue + '$2');
-        window.location = url;
-    } else {
-        url = url.replace(/[?#]$/, '');
-        url = url + (url.indexOf('?') > 0 ? '&' : '?') + paramName + '=' + paramValue;
-        window.location = url;
+
+function addOrUpdateUrlParam(paramName, paramValue, refresh) {
+    let searchParams = new URLSearchParams(window.location.search);
+    searchParams.set(paramName, paramValue);
+    
+    if(refresh)
+        window.location.search = searchParams.toString();
+    else {
+        var newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
+        history.pushState(null, '', newRelativePathQuery);
     }
 }
 
@@ -236,15 +235,15 @@ function updateGames(response, args) {
     console.log(args);
 
     if (args.week == undefined) {
-        updateWeekContainer(response.currentWeekNumber);
-        games = response.weeks[response.currentWeekNumber].events;
-        currentWeek = response.currentWeekNumber;
+        updateWeekContainer(currentWeekNumber, currentSeasonType);
+        games = response.season[currentSeasonType][currentWeekNumber].events;
+        selectedWeek = currentWeekNumber;
+        selectedSeasonType = currentSeasonType;
     }
     else {
-        updateWeekContainer(args.week);
-        games = response.weeks[args.week].events;
+        updateWeekContainer(args.week, args.seasontype);
+        games = response.season[args.seasontype][args.week].events;
     }
-
 
     let container = document.getElementById("content");
 
@@ -325,18 +324,39 @@ var HttpClient = function () {
     }
 }
 
-function updateWeekContainer(weekNumber) {
+function updateWeekContainer(weekNumber, seasonTypeNumber) {
+    let weekDropdown = document.getElementById("weekDropdown");
+    weekDropdown.textContent = `Week ${weekNumber}`;
+    let weekDropdownContainer = document.getElementById("weekDropdownContainer");
+    weekDropdownContainer.children[weekNumber-1].children[0].classList.add("active");
+
+
+    let seasonType = '';
+    if(seasonTypeNumber == 1)
+        seasonType = "Preseason"
+    if(seasonTypeNumber == 2)
+        seasonType = "Regular Season"
+    if(seasonTypeNumber == 3)
+        seasonType = "Postseason"
+    let seasonDropdown = document.getElementById("seasonDropdown");
+    seasonDropdown.textContent = `${seasonType}`;
+
+    let seasonDropdownContainer = document.getElementById("seasonDropdownContainer");
+    seasonDropdownContainer.children[seasonTypeNumber-1].children[0].classList.add("active");
+
+    /*
     let weekContainer = document.getElementById("nav-sub-container").children;
     Array.from(weekContainer).forEach(element => {
         element.className = "nav-sub-anchor";
     });
     console.log(`Week Number: ${weekNumber}`)
     weekContainer[weekNumber - 1].className = "nav-sub-anchor-active";
+    */
 }
 
 function updateDocument(endpoint, document, args) {
 
-    console.log(baseURL);
+    //console.log(baseURL);
     let searchURL = new URL(`${baseURL}${endpoint}`);
 
     let searchParams = new URLSearchParams(searchURL.searchParams);
@@ -344,8 +364,8 @@ function updateDocument(endpoint, document, args) {
         searchParams.append(key, value);
     }
     searchURL.search = searchParams;
-    console.log('GET Triggered');
-    console.log(searchURL.href);
+    console.log("===========================================");
+    console.log(`Sending GET REQUEST\n${searchURL.href}`);
 
     var client = new HttpClient();
     client.get(searchURL, function (response) {
@@ -354,35 +374,62 @@ function updateDocument(endpoint, document, args) {
 }
 
 function updateResponse(response, document, args) {
-    if (document.name == 'allGames') {
-        currentWeek = response.weekNumber;
+    if (document.name == 'gamesByWeek'){
         updateGames(response, args);
     }
-    if (document.name == 'gamesByWeek')
-        updateGames(response, args);
+    else if (document.name == 'current'){
+        console.log("===========================================");
+        console.log('Current Info:');
+        console.log(response);
+        currentSeasonType = response.currentSeasonType;
+        currentWeekNumber = response.currentWeekNumber;
+        console.log("===========================================");
+        if(getParameterByName('seasontype') == null || getParameterByName('week') == null){
+            addOrUpdateUrlParam('seasontype', response.currentSeasonType, false);
+            addOrUpdateUrlParam('week', response.currentWeekNumber, true);
+        }
+    }
 }
 
-function getGamesByWeek(week) {
-    console.log(`Getting Games for week ${week}`)
-    selectedWeek = week;
-    setLoading();
-    if (currentWeek == week || week == null) {
-        setLoading();
-        updateDocument('/api/nfl/ui/games', { name: 'allGames' }, {});
+function getCurrentSeasonWeek(){
+    updateDocument('/api/nfl/ui/current', { name: 'current' }, { });
+}
+
+function getGamesByWeek(seasonType, weekNumber) {
+    console.log("===========================================");
+    console.log(`Getting Games for season ${seasonType} week ${weekNumber}`)
+
+    console.log(`Searched Season: ` + seasonType)
+    console.log(`Searched Week: ` + weekNumber);
+    console.log("===========================================");
+
+    if(seasonType != null)
+        selectedSeasonType = seasonType;
+    if(weekNumber != null)
+        selectedWeekNumber = weekNumber;
+    
+    if ((currentWeekNumber == weekNumber && currentSeasonType == seasonType) || weekNumber == null || seasonType == null) {
+        console.log("Current week is selected");
+        selectedWeekNumber = currentWeekNumber;
+        selectedSeasonType = currentSeasonType;
+        addOrUpdateUrlParam('week', selectedWeekNumber, false);
+        addOrUpdateUrlParam('seasontype', selectedSeasonType, false);
+        getGamesUpdate();
         setInterval('getGamesUpdate();', 15000);
     }
     else {
-        updateDocument('/api/nfl/ui/games', { name: 'gamesByWeek' }, { week: week });
+        updateDocument('/api/nfl/ui/games', { name: 'gamesByWeek' }, { week: weekNumber, seasontype: seasonType });
     }
 }
 
 function getGamesUpdate() {
-    if (selectedWeek == currentWeek)
-        updateDocument('/api/nfl/ui/games', { name: 'allGames' }, {});
+    if (selectedWeekNumber == currentWeekNumber && selectedSeasonType == currentSeasonType){
+        console.log(`Getting Update for week ${selectedWeekNumber}`);
+        updateDocument('/api/nfl/ui/games', { name: 'gamesByWeek' }, {});
+    }
 }
 
 function setLoading() {
-    console.log("Loading")
     let container = document.getElementById("content");
     container.innerHTML = `<div class="spinner-border" style="width: 2rem; height: 2rem; margin: 2rem auto auto auto;" role="status">
     <span class="sr-only"></span>

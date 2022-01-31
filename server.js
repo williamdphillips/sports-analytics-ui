@@ -38,7 +38,7 @@ http.createServer(function (req, res) {
     }
 
     // if is a directory search for index file matching the extension
-    //if (fs.statSync(pathname).isDirectory()) pathname += '/index' + ext;
+    if (fs.statSync(pathname).isDirectory()) pathname += '/index' + ext;
 
     // read file from file system
     fs.readFile(pathname, function(err, data){

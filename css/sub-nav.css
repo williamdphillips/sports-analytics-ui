@@ -20,3 +20,8 @@
 .nav-sub-anchor:hover {
     color: rgb(219, 0, 0);
 }
+
+.nav-sub-dropdown {
+    background-color: white;
+    border-color: white;
+}
