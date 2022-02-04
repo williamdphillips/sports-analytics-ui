@@ -1,34 +1,11 @@
 // Sports Analytics
-let baseURL = 'http://192.168.1.243:8080';
-var resp = '';
-var games;
-var currentWeekNumber;
-var currentSeasonType;
-var selectedWeekNumber;
-var selectedSeasonType;
-
-// Parse the URL parameter
-function getParameterByName(name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-function addOrUpdateUrlParam(paramName, paramValue, refresh) {
-    let searchParams = new URLSearchParams(window.location.search);
-    searchParams.set(paramName, paramValue);
-    
-    if(refresh)
-        window.location.search = searchParams.toString();
-    else {
-        var newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
-        history.pushState(null, '', newRelativePathQuery);
-    }
-}
+let baseURL = 'http://localhost:8080';
+const resp = '';
+let games;
+let currentWeekNumber;
+let currentSeasonType;
+let selectedWeekNumber;
+let selectedSeasonType;
 
 function setInnerHtml(elm, html) {
     elm.innerHTML = html;
@@ -310,20 +287,6 @@ function updateGames(response, args) {
     }
 }
 
-var HttpClient = function () {
-    this.get = function (aUrl, aCallback) {
-        var anHttpRequest = new XMLHttpRequest();
-        anHttpRequest.onreadystatechange = function () {
-            if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-                aCallback(anHttpRequest.response);
-        }
-
-        anHttpRequest.open("GET", aUrl, true);
-        anHttpRequest.responseType = 'json';
-        anHttpRequest.send();
-    }
-}
-
 function updateWeekContainer(weekNumber, seasonTypeNumber) {
     let weekDropdown = document.getElementById("weekDropdown");
     weekDropdown.textContent = `Week ${weekNumber}`;
@@ -353,31 +316,8 @@ function updateWeekContainer(weekNumber, seasonTypeNumber) {
     weekContainer[weekNumber - 1].className = "nav-sub-anchor-active";
     */
 }
-
-function updateDocument(endpoint, document, args) {
-
-    //console.log(baseURL);
-    let searchURL = new URL(`${baseURL}${endpoint}`);
-
-    let searchParams = new URLSearchParams(searchURL.searchParams);
-    for (const [key, value] of Object.entries(args)) {
-        searchParams.append(key, value);
-    }
-    searchURL.search = searchParams;
-    console.log("===========================================");
-    console.log(`Sending GET REQUEST\n${searchURL.href}`);
-
-    var client = new HttpClient();
-    client.get(searchURL, function (response) {
-        updateResponse(response, document, args);
-    });
-}
-
-function updateResponse(response, document, args) {
-    if (document.name == 'gamesByWeek'){
-        updateGames(response, args);
-    }
-    else if (document.name == 'current'){
+function handleResponse(response, args) {
+    if (Object.keys(response).length === 2){
         console.log("===========================================");
         console.log('Current Info:');
         console.log(response);
@@ -388,11 +328,13 @@ function updateResponse(response, document, args) {
             addOrUpdateUrlParam('seasontype', response.currentSeasonType, false);
             addOrUpdateUrlParam('week', response.currentWeekNumber, true);
         }
+    }else {
+        updateGames(response, args);
     }
 }
 
 function getCurrentSeasonWeek(){
-    updateDocument('/api/nfl/ui/current', { name: 'current' }, { });
+    sendHttpRequest('GET', '/api/nfl/ui/current', null, handleResponse);
 }
 
 function getGamesByWeek(seasonType, weekNumber) {
@@ -418,7 +360,7 @@ function getGamesByWeek(seasonType, weekNumber) {
         setInterval('getGamesUpdate();', 15000);
     }
     else {
-        updateDocument('/api/nfl/ui/games', { name: 'gamesByWeek' }, { week: weekNumber, seasontype: seasonType });
+        sendHttpRequest('GET','/api/nfl/ui/games', { week: weekNumber, seasontype: seasonType }, handleResponse);
     }
 }
 

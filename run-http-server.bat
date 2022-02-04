@@ -1,3 +1,2 @@
-d:
-cd D:\OneDrive\Software Development\Projects\sports-analysis\frontend
+cd ~dp0
 http-server --cors
