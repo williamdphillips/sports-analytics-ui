@@ -36,7 +36,7 @@ function updateDocument(endpoint, document, params) {
 
 function updateResponse(response, document){
     if(document.name == 'GamesByWeek')
-        updateGames(response);
+        updateGameCards(response);
 }
 
 function getGamesByWeek(week) {

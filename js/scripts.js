@@ -1,11 +1,4 @@
 // Sports Analytics
-let baseURL = 'http://localhost:8080';
-const resp = '';
-let games;
-let currentWeekNumber;
-let currentSeasonType;
-let selectedWeekNumber;
-let selectedSeasonType;
 
 function setInnerHtml(elm, html) {
     elm.innerHTML = html;
@@ -18,7 +11,7 @@ function setInnerHtml(elm, html) {
     });
 }
 
-function getModel(game, i, accordionStatus) {
+function getCardModel(game, i, accordionStatus) {
     if (game.state == "pre" || game.state == "post") {
         return `<div class="col">
         <div class="card text-center">
@@ -205,13 +198,14 @@ function getModel(game, i, accordionStatus) {
     }
 }
 
-function updateGames(response, args) {
+function updateGameCards(response, args) {
 
     console.log("updating games");
     console.log(response);
     console.log(args);
+    let games;
 
-    if (args.week == undefined) {
+    if (args.week === undefined) {
         updateWeekContainer(currentWeekNumber, currentSeasonType);
         games = response.season[currentSeasonType][currentWeekNumber].events;
         selectedWeek = currentWeekNumber;
@@ -280,7 +274,7 @@ function updateGames(response, args) {
             let accordionStatus = "";
             if (collapseable != null)
                 if (collapseable.getAttribute("class").includes("show")) { accordionStatus = "show"; }
-            let model = getModel(game, i, accordionStatus);
+            let model = getCardModel(game, i, accordionStatus);
             htmlGames[i] = model;
         }
         setInnerHtml(container, htmlGames.join(''));
@@ -307,34 +301,10 @@ function updateWeekContainer(weekNumber, seasonTypeNumber) {
     let seasonDropdownContainer = document.getElementById("seasonDropdownContainer");
     seasonDropdownContainer.children[seasonTypeNumber-1].children[0].classList.add("active");
 
-    /*
-    let weekContainer = document.getElementById("nav-sub-container").children;
-    Array.from(weekContainer).forEach(element => {
-        element.className = "nav-sub-anchor";
-    });
-    console.log(`Week Number: ${weekNumber}`)
-    weekContainer[weekNumber - 1].className = "nav-sub-anchor-active";
-    */
-}
-function handleResponse(response, args) {
-    if (Object.keys(response).length === 2){
-        console.log("===========================================");
-        console.log('Current Info:');
-        console.log(response);
-        currentSeasonType = response.currentSeasonType;
-        currentWeekNumber = response.currentWeekNumber;
-        console.log("===========================================");
-        if(getParameterByName('seasontype') == null || getParameterByName('week') == null){
-            addOrUpdateUrlParam('seasontype', response.currentSeasonType, false);
-            addOrUpdateUrlParam('week', response.currentWeekNumber, true);
-        }
-    }else {
-        updateGames(response, args);
-    }
 }
 
 function getCurrentSeasonWeek(){
-    sendHttpRequest('GET', '/api/nfl/ui/current', null, handleResponse);
+    sendHttpRequest('GET', '/api/nfl/ui/current', null, handleGetResponse);
 }
 
 function getGamesByWeek(seasonType, weekNumber) {
@@ -356,24 +326,17 @@ function getGamesByWeek(seasonType, weekNumber) {
         selectedSeasonType = currentSeasonType;
         addOrUpdateUrlParam('week', selectedWeekNumber, false);
         addOrUpdateUrlParam('seasontype', selectedSeasonType, false);
-        getGamesUpdate();
-        setInterval('getGamesUpdate();', 15000);
+        getCurrentGamesUpdate();
+        setInterval('getCurrentGamesUpdate();', 15000);
     }
     else {
-        sendHttpRequest('GET','/api/nfl/ui/games', { week: weekNumber, seasontype: seasonType }, handleResponse);
+        sendHttpRequest('GET','/api/nfl/ui/games', { week: weekNumber, seasontype: seasonType }, handleGetResponse);
     }
 }
 
-function getGamesUpdate() {
+function getCurrentGamesUpdate() {
     if (selectedWeekNumber == currentWeekNumber && selectedSeasonType == currentSeasonType){
-        console.log(`Getting Update for week ${selectedWeekNumber}`);
-        updateDocument('/api/nfl/ui/games', { name: 'gamesByWeek' }, {});
+        console.log(`Getting Update for week ${currentWeekNumber}`);
+        sendHttpRequest('GET','/api/nfl/ui/games', { name: 'gamesByWeek' }, handleGetResponse);
     }
-}
-
-function setLoading() {
-    let container = document.getElementById("content");
-    container.innerHTML = `<div class="spinner-border" style="width: 2rem; height: 2rem; margin: 2rem auto auto auto;" role="status">
-    <span class="sr-only"></span>
-  </div>`;
 }

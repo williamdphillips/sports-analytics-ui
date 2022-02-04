@@ -100,5 +100,21 @@ function sendHttpRequest(requestType, endpoint, object, callbackFunction) {
             client.delete(searchURL);
             break;
     }
-
+}
+function handleGetResponse(response, args) {
+    //current will always return two elements
+    if (Object.keys(response).length === 2){
+        console.log("===========================================");
+        console.log('Current Info:');
+        console.log(response);
+        currentSeasonType = response.currentSeasonType;
+        currentWeekNumber = response.currentWeekNumber;
+        console.log("===========================================");
+        if(getParameterByName('seasontype') == null || getParameterByName('week') == null){
+            addOrUpdateUrlParam('seasontype', response.currentSeasonType, false);
+            addOrUpdateUrlParam('week', response.currentWeekNumber, true);
+        }
+    }else {
+        updateGameCards(response, args);
+    }
 }
