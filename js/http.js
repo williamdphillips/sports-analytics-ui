@@ -10,35 +10,41 @@ const HttpClient = function () {
         xhr.responseType = 'json';
         xhr.send();
     }
-    this.post = function (aUrl, object) {
+    this.post = function (aUrl, object, aCallback) {
         let json = JSON.stringify(object);
         const xhr = new XMLHttpRequest();
         xhr.onload = function () {
             // do something to response
-            console.log(this.responseText);
+            console.log(xhr.responseText);
+            if(aCallback != null)
+                aCallback(xhr.response)
         };
 
         xhr.open("POST", aUrl, true);
         xhr.setRequestHeader('content-type', 'application/json; charset=utf-8');
         xhr.send(json);
     }
-    this.put = function (aUrl, object) {
+    this.put = function (aUrl, object, aCallback) {
         let json = JSON.stringify(object);
         const xhr = new XMLHttpRequest();
         xhr.onload = function () {
             // do something to response
-            console.log(this.responseText);
+            console.log(xhr.responseText);
+            if(aCallback != null)
+                aCallback(xhr.response)
         };
 
         xhr.open("PUT", aUrl, true);
         xhr.setRequestHeader('content-type', 'application/json; charset=utf-8');
         xhr.send(json);
     }
-    this.delete = function (aUrl) {
+    this.delete = function (aUrl, aCallback) {
         const xhr = new XMLHttpRequest();
         xhr.onload = function () {
             // do something to response
-            console.log(this.responseText);
+            console.log(xhr.responseText);
+            if(aCallback != null)
+                aCallback(xhr.response)
         };
 
         xhr.open("DELETE", aUrl, true);
@@ -91,13 +97,19 @@ function sendHttpRequest(requestType, endpoint, object, callbackFunction) {
             });
             break;
         case 'POST':
-            client.post(searchURL, object);
+            client.post(searchURL, object, function (response) {
+                callbackFunction(response, object);
+            });
             break;
         case 'PUT':
-            client.put(searchURL, object);
+            client.put(searchURL, object, function (response) {
+                callbackFunction(response, object);
+            });
             break;
         case 'DELETE':
-            client.delete(searchURL);
+            client.delete(searchURL, function (response) {
+                callbackFunction(response, object);
+            });
             break;
     }
 }
