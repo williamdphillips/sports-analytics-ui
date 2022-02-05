@@ -3,7 +3,7 @@ const HttpClient = function () {
         const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200)
-                aCallback(xhr.response);
+                aCallback(xhr.status, xhr.response);
         }
 
         xhr.open("GET", aUrl, true);
@@ -17,7 +17,7 @@ const HttpClient = function () {
             // do something to response
             console.log(xhr.responseText);
             if(aCallback != null)
-                aCallback(xhr.response)
+                aCallback(xhr.status, xhr.response)
         };
 
         xhr.open("POST", aUrl, true);
@@ -31,7 +31,7 @@ const HttpClient = function () {
             // do something to response
             console.log(xhr.responseText);
             if(aCallback != null)
-                aCallback(xhr.response)
+                aCallback(xhr.status, xhr.response)
         };
 
         xhr.open("PUT", aUrl, true);
@@ -44,7 +44,7 @@ const HttpClient = function () {
             // do something to response
             console.log(xhr.responseText);
             if(aCallback != null)
-                aCallback(xhr.response)
+                aCallback(xhr.status, xhr.response)
         };
 
         xhr.open("DELETE", aUrl, true);
@@ -113,7 +113,7 @@ function sendHttpRequest(requestType, endpoint, object, callbackFunction) {
             break;
     }
 }
-function handleGetResponse(response, args) {
+function handleGetResponse(status, response, args) {
     //current will always return two elements
     if (Object.keys(response).length === 2){
         console.log("===========================================");
