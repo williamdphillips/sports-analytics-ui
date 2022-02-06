@@ -198,22 +198,23 @@ function getCardModel(game, i, accordionStatus) {
     }
 }
 
-function updateGameCards(response, args) {
+function updateGameCards(response) {
 
     console.log("updating games");
     console.log(response);
-    console.log(args);
+    let week = parseInt(getParameterByName('week'));
+    let seasonType = parseInt(getParameterByName('seasontype'));
     let games;
 
-    if (args.week === undefined) {
+    if (week === undefined) {
         updateWeekContainer(currentWeekNumber, currentSeasonType);
         games = response.season[currentSeasonType][currentWeekNumber].events;
         selectedWeek = currentWeekNumber;
         selectedSeasonType = currentSeasonType;
     }
     else {
-        updateWeekContainer(args.week, args.seasontype);
-        games = response.season[args.seasontype][args.week].events;
+        updateWeekContainer(week, seasonType);
+        games = response.season[seasonType][week].events;
     }
 
     let container = document.getElementById("content");

@@ -92,28 +92,20 @@ function sendHttpRequest(requestType, endpoint, object, callbackFunction) {
                 }
                 searchURL.search = searchParams;
             }
-            client.get(searchURL, function (response) {
-                callbackFunction(response, object);
-            });
+            client.get(searchURL, callbackFunction);
             break;
         case 'POST':
-            client.post(searchURL, object, function (response) {
-                callbackFunction(response, object);
-            });
+            client.post(searchURL, object, callbackFunction);
             break;
         case 'PUT':
-            client.put(searchURL, object, function (response) {
-                callbackFunction(response, object);
-            });
+            client.put(searchURL, object, callbackFunction);
             break;
         case 'DELETE':
-            client.delete(searchURL, function (response) {
-                callbackFunction(response, object);
-            });
+            client.delete(searchURL, callbackFunction);
             break;
     }
 }
-function handleGetResponse(status, response, args) {
+function handleGetResponse(status, response) {
     //current will always return two elements
     if (Object.keys(response).length === 2){
         console.log("===========================================");
@@ -127,6 +119,18 @@ function handleGetResponse(status, response, args) {
             addOrUpdateUrlParam('week', response.currentWeekNumber, true);
         }
     }else {
-        updateGameCards(response, args);
+        updateGameCards(response);
     }
+}
+
+function handlePostResponse(status, response){
+
+}
+
+function handlePutResponse(status, response){
+
+}
+
+function handleDeleteResponse(status, response){
+
 }
