@@ -88,7 +88,8 @@ function sendHttpRequest(requestType, endpoint, object, callbackFunction) {
             if(object != null) {
                 let searchParams = new URLSearchParams(searchURL.searchParams);
                 for (const [key, value] of Object.entries(object)) {
-                    searchParams.append(key, value);
+                    if(value != null)
+                        searchParams.append(key, value);
                 }
                 searchURL.search = searchParams;
             }
@@ -104,33 +105,4 @@ function sendHttpRequest(requestType, endpoint, object, callbackFunction) {
             client.delete(searchURL, callbackFunction);
             break;
     }
-}
-function handleGetResponse(status, response) {
-    //current will always return two elements
-    if (Object.keys(response).length === 2){
-        console.log("===========================================");
-        console.log('Current Info:');
-        console.log(response);
-        currentSeasonType = response.currentSeasonType;
-        currentWeekNumber = response.currentWeekNumber;
-        console.log("===========================================");
-        if(getParameterByName('seasontype') == null || getParameterByName('week') == null){
-            addOrUpdateUrlParam('seasontype', response.currentSeasonType, false);
-            addOrUpdateUrlParam('week', response.currentWeekNumber, true);
-        }
-    }else {
-        updateGameCards(response);
-    }
-}
-
-function handlePostResponse(status, response){
-
-}
-
-function handlePutResponse(status, response){
-
-}
-
-function handleDeleteResponse(status, response){
-
 }

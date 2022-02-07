@@ -199,9 +199,6 @@ function getCardModel(game, i, accordionStatus) {
 }
 
 function updateGameCards(response) {
-
-    console.log("updating games");
-    console.log(response);
     let week = parseInt(getParameterByName('week'));
     let seasonType = parseInt(getParameterByName('seasontype'));
     let games;
@@ -304,40 +301,43 @@ function updateWeekContainer(weekNumber, seasonTypeNumber) {
 
 }
 
-function getCurrentSeasonWeek(){
-    sendHttpRequest('GET', '/api/nfl/ui/current', null, handleGetResponse);
-}
-
 function getGamesByWeek(seasonType, weekNumber) {
     console.log("===========================================");
-    console.log(`Getting Games for season ${seasonType} week ${weekNumber}`)
+    if(seasonType != null && weekNumber != null)
+        console.log(`Getting Games for season ${seasonType} week ${weekNumber}`)
+    else
+        console.log(`Getting Games for current season and week`)
 
-    console.log(`Searched Season: ` + seasonType)
-    console.log(`Searched Week: ` + weekNumber);
-    console.log("===========================================");
+    sendHttpRequest('GET','/api/nfl/ui/games', { week: weekNumber, seasontype: seasonType }, function (status, response) {
 
-    if(seasonType != null)
-        selectedSeasonType = seasonType;
-    if(weekNumber != null)
-        selectedWeekNumber = weekNumber;
-    
-    if ((currentWeekNumber == weekNumber && currentSeasonType == seasonType) || weekNumber == null || seasonType == null) {
-        console.log("Current week is selected");
-        selectedWeekNumber = currentWeekNumber;
-        selectedSeasonType = currentSeasonType;
-        addOrUpdateUrlParam('week', selectedWeekNumber, false);
-        addOrUpdateUrlParam('seasontype', selectedSeasonType, false);
-        getCurrentGamesUpdate();
-        setInterval('getCurrentGamesUpdate();', 15000);
-    }
-    else {
-        sendHttpRequest('GET','/api/nfl/ui/games', { week: weekNumber, seasontype: seasonType }, handleGetResponse);
-    }
+        console.log(response);
+        currentSeasonType = response.currentSeasonType;
+        currentWeekNumber = response.currentWeekNumber;
+
+        if(seasonType != null)
+            selectedSeasonType = seasonType;
+        else
+            selectedSeasonType = response.currentSeasonType;
+
+        if(weekNumber == null)
+            selectedWeekNumber = response.currentWeekNumber;
+        else
+            selectedWeekNumber = weekNumber;
+
+        if (currentSeasonType == selectedSeasonType && currentWeekNumber == selectedWeekNumber) {
+            console.log("Current week is selected");
+            console.log("===========================================");
+            addOrUpdateUrlParam('seasontype', currentSeasonType, false);
+            addOrUpdateUrlParam('week', currentWeekNumber, false);
+        }
+
+        updateGameCards(response);
+    });
 }
 
 function getCurrentGamesUpdate() {
     if (selectedWeekNumber == currentWeekNumber && selectedSeasonType == currentSeasonType){
-        console.log(`Getting Update for week ${currentWeekNumber}`);
-        sendHttpRequest('GET','/api/nfl/ui/games', { name: 'gamesByWeek' }, handleGetResponse);
+        console.log(`* Fetching Update`);
+        getGamesByWeek(currentSeasonType, currentWeekNumber);
     }
 }

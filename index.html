@@ -306,13 +306,10 @@
 
     <script>
         setLoading();
-        getCurrentSeasonWeek();
         let seasonType = getParameterByName('seasontype');
         let weekNumber = getParameterByName('week');
-        if (seasonType != null && weekNumber != null) {
-            getGamesByWeek(seasonType, weekNumber);
-        }
-
+        getGamesByWeek(seasonType, weekNumber);
+        setInterval('getCurrentGamesUpdate();', 15000);
     </script>
 </body>
 
