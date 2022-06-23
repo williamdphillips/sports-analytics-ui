@@ -1,5 +1,7 @@
+let currentYearNumber;
 let currentWeekNumber;
 let currentSeasonType;
+let selectedYearNumber;
 let selectedWeekNumber;
 let selectedSeasonType;
 let baseURL = 'http://localhost:8080';

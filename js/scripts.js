@@ -199,19 +199,21 @@ function getCardModel(game, i, accordionStatus) {
 }
 
 function updateGameCards(response) {
+    let year = parseInt(getParameterByName('year'));
     let week = parseInt(getParameterByName('week'));
     let seasonType = parseInt(getParameterByName('seasontype'));
     let games;
 
     if (week === undefined) {
-        updateWeekContainer(currentWeekNumber, currentSeasonType);
-        games = response.season[currentSeasonType][currentWeekNumber].events;
-        selectedWeek = currentWeekNumber;
+        updateSubmenuContainers(currentYearNumber, currentWeekNumber, currentSeasonType);
+        games = response.schedules[year].season[currentSeasonType][currentWeekNumber].events;
+        selectedYearNumber = currentYearNumber;
+        selectedWeekNumber = currentWeekNumber;
         selectedSeasonType = currentSeasonType;
     }
     else {
-        updateWeekContainer(week, seasonType);
-        games = response.season[seasonType][week].events;
+        updateSubmenuContainers(year, week, seasonType);
+        games = response.schedules[year].season[seasonType][week].events;
     }
 
     let container = document.getElementById("content");
@@ -279,11 +281,17 @@ function updateGameCards(response) {
     }
 }
 
-function updateWeekContainer(weekNumber, seasonTypeNumber) {
+function updateSubmenuContainers(year, week, seasonTypeNumber) {
+
+    let yearDropdown = document.getElementById("yearDropdown");
+    yearDropdown.textContent = `${year}`;
+    let yearDropdownContainer = document.getElementById("yearDropdownContainer");
+    //yearDropdownContainer.children[year-1].children[0].classList.add("active");
+
     let weekDropdown = document.getElementById("weekDropdown");
-    weekDropdown.textContent = `Week ${weekNumber}`;
+    weekDropdown.textContent = `Week ${week}`;
     let weekDropdownContainer = document.getElementById("weekDropdownContainer");
-    weekDropdownContainer.children[weekNumber-1].children[0].classList.add("active");
+    weekDropdownContainer.children[week-1].children[0].classList.add("active");
 
 
     let seasonType = '';
@@ -301,18 +309,24 @@ function updateWeekContainer(weekNumber, seasonTypeNumber) {
 
 }
 
-function getGamesByWeek(seasonType, weekNumber) {
+function getGamesByWeek(yearNumber, seasonType, weekNumber) {
     console.log("===========================================");
-    if(seasonType != null && weekNumber != null)
-        console.log(`Getting Games for season ${seasonType} week ${weekNumber}`)
+    if(yearNumber != null && seasonType != null && weekNumber != null)
+        console.log(`Getting Games for year ${yearNumber} season ${seasonType} week ${weekNumber}`)
     else
         console.log(`Getting Games for current season and week`)
 
-    sendHttpRequest('GET','/api/nfl/ui/games', { week: weekNumber, seasontype: seasonType }, function (status, response) {
+    sendHttpRequest('GET','/api/nfl/ui/games', { year: yearNumber, week: weekNumber, seasontype: seasonType }, function (status, response) {
 
         console.log(response);
+        currentYearNumber = response.currentYearNumber;
         currentSeasonType = response.currentSeasonType;
         currentWeekNumber = response.currentWeekNumber;
+
+        if(yearNumber != null)
+            selectedYearNumber = yearNumber;
+        else
+            selectedYearNumber = response.currentYearNumber;
 
         if(seasonType != null)
             selectedSeasonType = seasonType;
@@ -324,11 +338,12 @@ function getGamesByWeek(seasonType, weekNumber) {
         else
             selectedWeekNumber = weekNumber;
 
-        if (currentSeasonType == selectedSeasonType && currentWeekNumber == selectedWeekNumber) {
+        if (currentYearNumber == selectedYearNumber && currentSeasonType == selectedSeasonType && currentWeekNumber == selectedWeekNumber) {
             console.log("Current week is selected");
             console.log("===========================================");
             addOrUpdateUrlParam('seasontype', currentSeasonType, false);
             addOrUpdateUrlParam('week', currentWeekNumber, false);
+            addOrUpdateUrlParam('year', currentYearNumber, false);
         }
 
         updateGameCards(response);
@@ -336,8 +351,8 @@ function getGamesByWeek(seasonType, weekNumber) {
 }
 
 function getCurrentGamesUpdate() {
-    if (selectedWeekNumber == currentWeekNumber && selectedSeasonType == currentSeasonType){
+    if (currentYearNumber == selectedYearNumber && selectedWeekNumber == currentWeekNumber && selectedSeasonType == currentSeasonType){
         console.log(`* Fetching Update`);
-        getGamesByWeek(currentSeasonType, currentWeekNumber);
+        getGamesByWeek(currentYearNumber, currentSeasonType, currentWeekNumber);
     }
 }

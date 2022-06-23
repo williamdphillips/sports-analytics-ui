@@ -59,9 +59,18 @@
     <div class="navbar-expand-sm navbar-light bg-light shadow-sm">
         <div class="container p-1 text-center">
             <div class="dropdown d-inline-block">
+                <button class="--bs-body-color btn dropdown-toggle" type="button" id="yearDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="seasonDropdown" id="yearDropdownContainer">
+                    <li><a class="dropdown-item" href="javascript:addOrUpdateUrlParam('year', 2021, true);">2021</a></li>
+                    <li><a class="dropdown-item" href="javascript:addOrUpdateUrlParam('year', 2020, true);">2020</a></li>
+                    <li><a class="dropdown-item" href="javascript:addOrUpdateUrlParam('year', 2019, true);">2019</a></li>
+                </ul>
+            </div>
+            <div class="dropdown d-inline-block">
                 <button class="--bs-body-color btn dropdown-toggle" type="button" id="seasonDropdown"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                    Preseason
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="seasonDropdown" id="seasonDropdownContainer">
                     <li><a class="dropdown-item" href="javascript:addOrUpdateUrlParam('seasontype', 1, true);">Preseason</a></li>
@@ -72,7 +81,6 @@
             <div class="dropdown d-inline-block">
                 <button class="--bs-body-color btn dropdown-toggle" type="button" id="weekDropdown"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                    Week X
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="weekDropdown" id="weekDropdownContainer">
                     <li><a class="dropdown-item" href="javascript:addOrUpdateUrlParam('week', 1, true);">Week 1</a></li>
@@ -306,9 +314,10 @@
 
     <script>
         setLoading();
+        let yearNumber = getParameterByName('year');
         let seasonType = getParameterByName('seasontype');
         let weekNumber = getParameterByName('week');
-        getGamesByWeek(seasonType, weekNumber);
+        getGamesByWeek(yearNumber, seasonType, weekNumber);
         setInterval('getCurrentGamesUpdate();', 15000);
     </script>
 </body>
