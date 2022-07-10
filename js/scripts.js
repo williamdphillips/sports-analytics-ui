@@ -206,14 +206,14 @@ function updateGameCards(response) {
 
     if (week === undefined) {
         updateSubmenuContainers(currentYearNumber, currentWeekNumber, currentSeasonType);
-        games = response.schedules[year].season[currentSeasonType][currentWeekNumber].events;
+        games = response.season[currentSeasonType][currentWeekNumber].events;
         selectedYearNumber = currentYearNumber;
         selectedWeekNumber = currentWeekNumber;
         selectedSeasonType = currentSeasonType;
     }
     else {
         updateSubmenuContainers(year, week, seasonType);
-        games = response.schedules[year].season[seasonType][week].events;
+        games = response.season[seasonType][week].events;
     }
 
     let container = document.getElementById("content");
@@ -286,7 +286,8 @@ function updateSubmenuContainers(year, week, seasonTypeNumber) {
     let yearDropdown = document.getElementById("yearDropdown");
     yearDropdown.textContent = `${year}`;
     let yearDropdownContainer = document.getElementById("yearDropdownContainer");
-    //yearDropdownContainer.children[year-1].children[0].classList.add("active");
+    //TODO: Make year selection dynamic instead of hardcoded
+    yearDropdownContainer.children[2022-year].children[0].classList.add("active");
 
     let weekDropdown = document.getElementById("weekDropdown");
     weekDropdown.textContent = `Week ${week}`;
