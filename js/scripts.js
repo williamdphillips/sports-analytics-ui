@@ -352,7 +352,11 @@ function getGamesByWeek(yearNumber, seasonType, weekNumber) {
 }
 
 function getCurrentGamesUpdate() {
-    if (currentYearNumber == selectedYearNumber && selectedWeekNumber == currentWeekNumber && selectedSeasonType == currentSeasonType){
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+
+    if (currentYearNumber == selectedYearNumber == params.year && selectedWeekNumber == currentWeekNumber == params.week && selectedSeasonType == currentSeasonType == params.seasontype){
         console.log(`* Fetching Update`);
         getGamesByWeek(currentYearNumber, currentSeasonType, currentWeekNumber);
     }
