@@ -136,7 +136,7 @@
     </div>
     <!-- Page content-->
     <div class="container" style="margin-top: 1rem;">
-        <div class="row row-cols-1 row-cols-md-3 g-4" id="content">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-4" id="content">
             <div class="col">
                 <div class="card text-center">
                     <div class="card-body">
@@ -150,7 +150,7 @@
                                 height="12" alt="">
                         </div>
                         <div class="card-center" href="#">
-                            <p class="card-bold" style="font-size: 2rem; margin-bottom: 0;">43-27</p>
+                            <p class="card-bold">43-27</p>
                             <p class="card-center-small">4th Quarter</p>
                         </div>
                         <div class="card-right" href="#">
@@ -338,7 +338,7 @@
         let seasonType = getParameterByName('seasontype');
         let weekNumber = getParameterByName('week');
         getGamesByWeek(yearNumber, seasonType, weekNumber);
-        setInterval('getCurrentGamesUpdate();', 15000);
+        setInterval('getCurrentGamesUpdate();', 10000);
     </script>
 </body>
 

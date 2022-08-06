@@ -26,7 +26,7 @@ function getCardModel(game, i, accordionStatus) {
                     height="12" alt="" style="${game.currentPlay.awayTeamPossession}">
         </div>
         <div class="card-center" href="#">
-            <p class="card-bold" style="font-size: 2rem; margin-bottom: 0;">${game.awayTeam.currentScore}-${game.homeTeam.currentScore}</p>
+            <p class="card-bold">${game.awayTeam.currentScore}-${game.homeTeam.currentScore}</p>
             <p class="card-center-small">
                 ${game.shortDetail}
             </p>
@@ -352,11 +352,13 @@ function getGamesByWeek(yearNumber, seasonType, weekNumber) {
 }
 
 function getCurrentGamesUpdate() {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
+    let params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop),
     });
 
-    if (currentYearNumber == selectedYearNumber == params.year && selectedWeekNumber == currentWeekNumber == params.week && selectedSeasonType == currentSeasonType == params.seasontype){
+    if (currentYearNumber === selectedYearNumber &&
+        selectedWeekNumber === currentWeekNumber &&
+        selectedSeasonType === currentSeasonType){
         console.log(`* Fetching Update`);
         getGamesByWeek(currentYearNumber, currentSeasonType, currentWeekNumber);
     }

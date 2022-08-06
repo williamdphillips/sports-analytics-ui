@@ -4,7 +4,7 @@ let currentSeasonType;
 let selectedYearNumber;
 let selectedWeekNumber;
 let selectedSeasonType;
-let baseURL = 'http://localhost:8080';
+let baseURL = 'http://192.168.1.243:8080';
 
 function setLoading() {
     let container = document.getElementById("content");
