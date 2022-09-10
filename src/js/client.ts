@@ -1,3 +1,5 @@
+import {updateGameCards} from "./scripts";
+
 let baseURL = 'http://localhost:8080';
 var resp = '';
 
@@ -10,20 +12,22 @@ var HttpClient = function() {
         }
         
         anHttpRequest.open("GET", aUrl, true );
+        // @ts-ignore
         anHttpRequest.responseType = 'jsonp';
         anHttpRequest.send();
     }
 }
 
-function updateDocument(endpoint, document, params) {
+function updateDocument(endpoint, document, params:Map<string, string>) {
 
     console.log(baseURL);
     let searchURL = new URL(`${baseURL}${endpoint}`);
 
     let searchParams = new URLSearchParams(searchURL.searchParams);
-    for (const [key, value] of Object.entries(params)) {
+    for (const [key, value] of params.entries()) {
         searchParams.append(key, value);
     }
+    // @ts-ignore
     searchURL.search = searchParams;
     console.log('GET Triggered');
     console.log(searchURL.href);
@@ -39,7 +43,8 @@ function updateResponse(response, document){
         updateGameCards(response);
 }
 
-function getGamesByWeek(week) {
+export function getGamesByWeek(week) {
+    // @ts-ignore
     updateDocument('/api/nfl/simple/games', {name:'GamesByWeek'}, { week: week });
 }
 

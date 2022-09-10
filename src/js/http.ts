@@ -1,3 +1,5 @@
+import {env} from "./global.js";
+
 const HttpClient = function () {
     this.get = function (aUrl, aCallback) {
         const xhr = new XMLHttpRequest();
@@ -53,7 +55,7 @@ const HttpClient = function () {
     }
 };
 
-function getParameterByName(name, url) {
+export function getParameterByName(name, url = null) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, "\\$&");
     const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
@@ -63,7 +65,7 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-function addOrUpdateUrlParam(paramName, paramValue, refresh) {
+export function addOrUpdateUrlParam(paramName, paramValue, refresh) {
     let searchParams = new URLSearchParams(window.location.search);
     searchParams.set(paramName, paramValue);
 
@@ -76,30 +78,31 @@ function addOrUpdateUrlParam(paramName, paramValue, refresh) {
 }
 
 //Eg. GET, /api/users, { name:'Andy' }, doSomething(response)
-function sendHttpRequest(requestType, endpoint, object, callbackFunction) {
+export function sendHttpRequest(requestType, endpoint, params: Map<string, string>, callbackFunction) {
 
     console.log("===========================================");
     console.log(`Sending ${requestType} REQUEST to\n${endpoint}`);
-    let searchURL = new URL(`${baseURL}${endpoint}`);
+    let searchURL = new URL(`${env.baseURL}${endpoint}`);
     let client = new HttpClient();
 
     switch(requestType) {
         case 'GET':
-            if(object != null) {
+            if(params != null) {
                 let searchParams = new URLSearchParams(searchURL.searchParams);
-                for (const [key, value] of Object.entries(object)) {
+                Object.entries(params).forEach(([key,value]) => {
                     if(value != null)
                         searchParams.append(key, value);
-                }
+                })
+                // @ts-ignore
                 searchURL.search = searchParams;
             }
             client.get(searchURL, callbackFunction);
             break;
         case 'POST':
-            client.post(searchURL, object, callbackFunction);
+            client.post(searchURL, params, callbackFunction);
             break;
         case 'PUT':
-            client.put(searchURL, object, callbackFunction);
+            client.put(searchURL, params, callbackFunction);
             break;
         case 'DELETE':
             client.delete(searchURL, callbackFunction);

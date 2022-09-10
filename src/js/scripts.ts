@@ -1,12 +1,19 @@
 // Sports Analytics
 
+import {env, setLoading} from "./global.js";
+import {addOrUpdateUrlParam, getParameterByName, sendHttpRequest} from "./http.js";
+
 function setInnerHtml(elm, html) {
     elm.innerHTML = html;
     Array.from(elm.querySelectorAll("script")).forEach(oldScript => {
         const newScript = document.createElement("script");
+        // @ts-ignore
         Array.from(oldScript.attributes)
+            // @ts-ignore
             .forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        // @ts-ignore
         newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+        // @ts-ignore
         oldScript.parentNode.replaceChild(newScript, oldScript);
     });
 }
@@ -181,12 +188,12 @@ function getCardModel(game, i, accordionStatus) {
         <div id="collapse${i}" class="panel-collapse collapse in ${accordionStatus}">
             <div class="panel-body">
             <p style="margin-bottom: 0; font-size: .9rem;">${game.currentPlay.driveDescription}</p>
-                <div class="card-endzone away-team" style="background-color: #${game.awayTeam.primaryColor};"></div>
+                <div class="card-endzone away-team" style="background-color: @ts-ignore#${game.awayTeam.primaryColor};"></div>
                 <div class="card-football-field">
                     <div class="first-down-line" style="left: ${game.currentPlay.firstDownLine}%;"></div>
                     <div class="line-of-scrimmage" style="left: ${game.currentPlay.yardLine}%"></div>
                 </div>
-                <div class="card-endzone home-team" style="background-color: #${game.homeTeam.primaryColor};"></div>
+                <div class="card-endzone home-team" style="background-color: @ts-ignore#${game.homeTeam.primaryColor};"></div>
                 <p style="margin:0; font-size: .9rem;">${game.currentPlay.playDescription}</p>
                 <button class="btn btn-light" style="margin-top: 0.5em;">Watch Live</button>
             </div>
@@ -208,18 +215,18 @@ function calculateWinPercentage(prediction, moneyLine){
     }
 }
 
-function updateGameCards(response) {
+export function updateGameCards(response) {
     let year = parseInt(getParameterByName('year'));
     let week = parseInt(getParameterByName('week'));
     let seasonType = parseInt(getParameterByName('seasontype'));
     let games;
 
     if (week === undefined) {
-        updateSubmenuContainers(currentYearNumber, currentWeekNumber, currentSeasonType);
-        games = response.season[currentSeasonType][currentWeekNumber].events;
-        selectedYearNumber = currentYearNumber;
-        selectedWeekNumber = currentWeekNumber;
-        selectedSeasonType = currentSeasonType;
+        updateSubmenuContainers(env.currentYearNumber, env.currentWeekNumber, env.currentSeasonType);
+        games = response.season[env.currentSeasonType][env.currentWeekNumber].events;
+        env.selectedYearNumber = env.currentYearNumber;
+        env.selectedWeekNumber = env.currentWeekNumber;
+        env.selectedSeasonType = env.currentSeasonType;
     }
     else {
         updateSubmenuContainers(year, week, seasonType);
@@ -230,7 +237,7 @@ function updateGameCards(response) {
 
     let htmlGames = [];
     if (games != null) {
-        for (i = 0; i < games.length; i++) {
+        for (let i = 0; i < games.length; i++) {
             let game = games[i];
 
             if (game.period == 1 || game.period == 2) {
@@ -327,35 +334,37 @@ function getGamesByWeek(yearNumber, seasonType, weekNumber) {
         console.log(`Getting Games for year ${yearNumber} season ${seasonType} week ${weekNumber}`)
     else
         console.log(`Getting Games for current season and week`)
-
+    //@ts-ignore
     sendHttpRequest('GET','/api/nfl/ui/games', { year: yearNumber, week: weekNumber, seasontype: seasonType }, function (status, response) {
 
         console.log(response);
-        currentYearNumber = response.currentYearNumber;
-        currentSeasonType = response.currentSeasonType;
-        currentWeekNumber = response.currentWeekNumber;
+        env.currentYearNumber = response.currentYearNumber;
+        env.currentSeasonType = response.currentSeasonType;
+        env.currentWeekNumber = response.currentWeekNumber;
 
         if(yearNumber != null)
-            selectedYearNumber = yearNumber;
+            env.selectedYearNumber = yearNumber;
         else
-            selectedYearNumber = response.currentYearNumber;
+            env.selectedYearNumber = response.currentYearNumber;
 
         if(seasonType != null)
-            selectedSeasonType = seasonType;
+            env.selectedSeasonType = seasonType;
         else
-            selectedSeasonType = response.currentSeasonType;
+            env.selectedSeasonType = response.currentSeasonType;
 
         if(weekNumber == null)
-            selectedWeekNumber = response.currentWeekNumber;
+            env.selectedWeekNumber = response.currentWeekNumber;
         else
-            selectedWeekNumber = weekNumber;
+            env.selectedWeekNumber = weekNumber;
 
-        if (currentYearNumber == selectedYearNumber && currentSeasonType == selectedSeasonType && currentWeekNumber == selectedWeekNumber) {
+        if (env.currentYearNumber == env.selectedYearNumber &&
+            env.currentSeasonType == env.selectedSeasonType &&
+            env.currentWeekNumber == env.selectedWeekNumber) {
             console.log("Current week is selected");
             console.log("===========================================");
-            addOrUpdateUrlParam('seasontype', currentSeasonType, false);
-            addOrUpdateUrlParam('week', currentWeekNumber, false);
-            addOrUpdateUrlParam('year', currentYearNumber, false);
+            addOrUpdateUrlParam('seasontype', env.currentSeasonType, false);
+            addOrUpdateUrlParam('week', env.currentWeekNumber, false);
+            addOrUpdateUrlParam('year', env.currentYearNumber, false);
         }
 
         updateGameCards(response);
@@ -363,14 +372,19 @@ function getGamesByWeek(yearNumber, seasonType, weekNumber) {
 }
 
 function getCurrentGamesUpdate() {
-    let params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
-    });
-
-    if (currentYearNumber === selectedYearNumber &&
-        selectedWeekNumber === currentWeekNumber &&
-        selectedSeasonType === currentSeasonType){
+    if (env.currentYearNumber == env.selectedYearNumber &&
+        env.selectedWeekNumber == env.currentWeekNumber &&
+        env.selectedSeasonType == env.currentSeasonType){
         console.log(`* Fetching Update`);
-        getGamesByWeek(currentYearNumber, currentSeasonType, currentWeekNumber);
+        getGamesByWeek(env.currentYearNumber, env.currentSeasonType, env.currentWeekNumber);
     }
 }
+
+export function init() {
+    setLoading();
+    let yearNumber = getParameterByName('year');
+    let seasonType = getParameterByName('seasontype');
+    let weekNumber = getParameterByName('week');
+    getGamesByWeek(yearNumber, seasonType, weekNumber);
+    setInterval(getCurrentGamesUpdate, 10000);
+};
