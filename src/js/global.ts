@@ -5,7 +5,7 @@ export var env = {
     selectedYearNumber: "",
     selectedWeekNumber: "",
     selectedSeasonType: "",
-    baseURL: 'http://192.168.1.243:8080'
+    baseURL: 'http://127.0.0.1:8080'
 }
 
 export function setLoading() {

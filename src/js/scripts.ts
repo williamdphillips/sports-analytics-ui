@@ -188,12 +188,12 @@ function getCardModel(game, i, accordionStatus) {
         <div id="collapse${i}" class="panel-collapse collapse in ${accordionStatus}">
             <div class="panel-body">
             <p style="margin-bottom: 0; font-size: .9rem;">${game.currentPlay.driveDescription}</p>
-                <div class="card-endzone away-team" style="background-color: @ts-ignore#${game.awayTeam.primaryColor};"></div>
+                <div class="card-endzone away-team" style="background-color: #${game.awayTeam.primaryColor};"></div>
                 <div class="card-football-field">
                     <div class="first-down-line" style="left: ${game.currentPlay.firstDownLine}%;"></div>
                     <div class="line-of-scrimmage" style="left: ${game.currentPlay.yardLine}%"></div>
                 </div>
-                <div class="card-endzone home-team" style="background-color: @ts-ignore#${game.homeTeam.primaryColor};"></div>
+                <div class="card-endzone home-team" style="background-color: #${game.homeTeam.primaryColor};"></div>
                 <p style="margin:0; font-size: .9rem;">${game.currentPlay.playDescription}</p>
                 <button class="btn btn-light" style="margin-top: 0.5em;">Watch Live</button>
             </div>

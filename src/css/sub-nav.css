@@ -1,3 +1,11 @@
+.nav-sub {
+    background-image: linear-gradient(45deg, #97233F 50%, white 50%);
+}
+
+.nav-sub-inner {
+    background-image: linear-gradient(45deg, #97233F 90%, white 10%);
+}
+
 .nav-sub-middle {
     text-align: center;
     color: gray;
